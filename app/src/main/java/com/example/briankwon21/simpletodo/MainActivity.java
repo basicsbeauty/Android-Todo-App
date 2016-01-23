@@ -8,7 +8,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 
@@ -16,17 +15,14 @@ import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
 
-import org.apache.commons.io.FileUtils;
-
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 
 public class MainActivity extends ActionBarActivity {
-    ArrayList<String> todoItems;
-    ArrayAdapter<String> todoAdapter;
+    ArrayList<TodoItem> todoItems;
+    TodoItemsAdapter todoAdapter;
     ListView lvItems;
     EditText etNewItem;
+    TodoItemDatabaseHelper databaseHelper;
 
     private GoogleApiClient client;
 
@@ -34,7 +30,11 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        databaseHelper = TodoItemDatabaseHelper.getInstance(this);
+
         populateArrayItems();
+
         lvItems = (ListView) findViewById(R.id.lvItems);
         lvItems.setAdapter(todoAdapter);
         etNewItem = (EditText) findViewById(R.id.etNewItem);
@@ -46,8 +46,9 @@ public class MainActivity extends ActionBarActivity {
     }
 
     public void populateArrayItems() {
-        readItems();
-        todoAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, todoItems);
+//        readItems();
+        todoItems = databaseHelper.getAllItems();
+        todoAdapter = new TodoItemsAdapter(this, todoItems);
     }
 
     @Override
@@ -114,18 +115,23 @@ public class MainActivity extends ActionBarActivity {
 
     public void onAddItem(View view) {
         String newItemText = etNewItem.getText().toString();
-        todoAdapter.add(newItemText);
+
+        databaseHelper.addTodoItem(newItemText);
+
+        TodoItem newItem = new TodoItem(newItemText);
+        todoAdapter.add(newItem);
+        todoAdapter.notifyDataSetChanged();
         etNewItem.setText("");
-        writeItems();
+
     }
 
     private void setupListViewListener() {
         lvItems.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int pos, long id) {
+                databaseHelper.deleteItem(todoItems.get(pos));
                 todoItems.remove(pos);
                 todoAdapter.notifyDataSetChanged();
-                writeItems();
                 return true;
             }
         });
@@ -135,7 +141,8 @@ public class MainActivity extends ActionBarActivity {
             public void onItemClick(AdapterView<?> parent, View view, int pos, long id) {
                 Intent editIntent = new Intent(MainActivity.this, EditItemActivity.class);
                 editIntent.putExtra("pos", pos);
-                editIntent.putExtra("name", todoItems.get(pos));
+                editIntent.putExtra("itemText", todoItems.get(pos).getText());
+                editIntent.putExtra("itemId", todoItems.get(pos).getId());
                 startActivityForResult(editIntent, 200);
             }
         });
@@ -144,31 +151,17 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == 200 && requestCode == 200) {
-            String name = data.getExtras().getString("name");
+            String itemText = data.getStringExtra("itemText");
+            long itemId = data.getLongExtra("itemId", 1);
             int pos = data.getExtras().getInt("pos");
-            todoItems.set(pos, name);
+            todoItems.get(pos).setText(itemText);
             todoAdapter.notifyDataSetChanged();
-            writeItems();
+            databaseHelper.updateItem(itemId, itemText);
         }
     }
 
     private void readItems() {
-        File filesDir = getFilesDir();
-        File file = new File(filesDir, "todo.txt");
-        try {
-            todoItems = new ArrayList<String>(FileUtils.readLines(file));
-        } catch (IOException e) {
-            todoItems = new ArrayList<String>();
-        }
+        todoItems = databaseHelper.getAllItems();
     }
 
-    private void writeItems() {
-        File filesDir = getFilesDir();
-        File todoFile = new File(filesDir, "todo.txt");
-        try {
-            FileUtils.writeLines(todoFile, todoItems);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 }
