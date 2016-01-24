@@ -7,4 +7,6 @@
     <string name="edit_item_text">Edit Item Below:</string>
     <string name="item_name" />
     <string name="saveBtn">Save</string>
+    <string name="tvNameLabel">Task Name</string>
+    <string name="tvDueDateLabel">Due Date</string>
 </resources>

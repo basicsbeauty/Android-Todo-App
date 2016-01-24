@@ -141,8 +141,11 @@ public class MainActivity extends ActionBarActivity {
             public void onItemClick(AdapterView<?> parent, View view, int pos, long id) {
                 Intent editIntent = new Intent(MainActivity.this, EditItemActivity.class);
                 editIntent.putExtra("pos", pos);
-                editIntent.putExtra("itemText", todoItems.get(pos).getText());
                 editIntent.putExtra("itemId", todoItems.get(pos).getId());
+                editIntent.putExtra("itemText", todoItems.get(pos).getText());
+                editIntent.putExtra("year", todoItems.get(pos).getYear());
+                editIntent.putExtra("month", todoItems.get(pos).getMonth());
+                editIntent.putExtra("day", todoItems.get(pos).getDay());
                 startActivityForResult(editIntent, 200);
             }
         });
@@ -151,12 +154,20 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == 200 && requestCode == 200) {
+            int pos = data.getExtras().getInt("pos");
             String itemText = data.getStringExtra("itemText");
             long itemId = data.getLongExtra("itemId", 1);
-            int pos = data.getExtras().getInt("pos");
-            todoItems.get(pos).setText(itemText);
+            int year = data.getIntExtra("year", 0);
+            int month = data.getIntExtra("month", 0);
+            int day = data.getIntExtra("day", 0);
+
+            TodoItem currentItem = todoItems.get(pos);
+            currentItem.setText(itemText);
+            currentItem.setYear(year);
+            currentItem.setMonth(month);
+            currentItem.setDay(day);
             todoAdapter.notifyDataSetChanged();
-            databaseHelper.updateItem(itemId, itemText);
+            databaseHelper.updateItem(itemId, itemText, year, month, day);
         }
     }
 

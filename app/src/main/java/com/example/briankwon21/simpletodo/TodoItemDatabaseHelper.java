@@ -14,12 +14,15 @@ public class TodoItemDatabaseHelper extends SQLiteOpenHelper {
     private static TodoItemDatabaseHelper sInstance;
 
     private static final String DATABASE_NAME = "todoItemDatabase";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 5;
 
     private static final String TABLE_TODOITEMS = "todoItems";
 
     private static final String KEY_TODOITEM_ID = "id";
     private static final String KEY_TODOITEM_TEXT = "text";
+    private static final String KEY_TODOITEM_YEAR = "year";
+    private static final String KEY_TODOITEM_MONTH = "month";
+    private static final String KEY_TODOITEM_DAY = "day";
 
     private static final String TAG = "MainActivity";
 
@@ -45,7 +48,10 @@ public class TodoItemDatabaseHelper extends SQLiteOpenHelper {
         String CREATE_TODOITEMS_TABLE = "CREATE TABLE " + TABLE_TODOITEMS +
                 "(" +
                 KEY_TODOITEM_ID + " INTEGER PRIMARY KEY," +
-                KEY_TODOITEM_TEXT + " TEXT" +
+                KEY_TODOITEM_TEXT + " TEXT," +
+                KEY_TODOITEM_YEAR + " INTEGER," +
+                KEY_TODOITEM_MONTH + " INTEGER," +
+                KEY_TODOITEM_DAY + " INTEGER" +
                 ")";
 
         db.execSQL(CREATE_TODOITEMS_TABLE);
@@ -89,8 +95,17 @@ public class TodoItemDatabaseHelper extends SQLiteOpenHelper {
             if (cursor.moveToFirst()) {
                 do {
                     TodoItem item = new TodoItem();
-                    item.setText(cursor.getString(cursor.getColumnIndex(KEY_TODOITEM_TEXT)));
                     item.setId(cursor.getLong(cursor.getColumnIndex(KEY_TODOITEM_ID)));
+                    item.setText(cursor.getString(cursor.getColumnIndex(KEY_TODOITEM_TEXT)));
+
+                    int year = cursor.getInt(cursor.getColumnIndex(KEY_TODOITEM_YEAR));
+                    int month = cursor.getInt(cursor.getColumnIndex(KEY_TODOITEM_MONTH));
+                    int day = cursor.getInt(cursor.getColumnIndex(KEY_TODOITEM_DAY));
+
+                    item.setYear(year);
+                    item.setMonth(month);
+                    item.setDay(day);
+
                     items.add(item);
                 } while (cursor.moveToNext());
             }
@@ -104,11 +119,14 @@ public class TodoItemDatabaseHelper extends SQLiteOpenHelper {
         return items;
     }
 
-    public int updateItem(long id, String text) {
+    public int updateItem(long id, String text, int year, int month, int day) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
         values.put(KEY_TODOITEM_TEXT, text);
+        values.put(KEY_TODOITEM_YEAR, year);
+        values.put(KEY_TODOITEM_MONTH, month);
+        values.put(KEY_TODOITEM_DAY, day);
 
         return db.update(TABLE_TODOITEMS, values, "id = ? ", new String[] { Long.toString(id) } );
     }
