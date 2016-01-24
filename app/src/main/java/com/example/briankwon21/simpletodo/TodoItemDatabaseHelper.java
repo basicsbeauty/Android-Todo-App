@@ -65,16 +65,19 @@ public class TodoItemDatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    public void addTodoItem(String itemText) {
+    public void addTodoItem(TodoItem item) {
         SQLiteDatabase db = getWritableDatabase();
 
         db.beginTransaction();
         try {
             ContentValues values = new ContentValues();
-            values.put(KEY_TODOITEM_TEXT, itemText);
+            values.put(KEY_TODOITEM_TEXT, item.getText());
+            values.put(KEY_TODOITEM_YEAR, item.getYear());
+            values.put(KEY_TODOITEM_MONTH, item.getMonth());
+            values.put(KEY_TODOITEM_DAY, item.getDay());
 
             long id = db.insertOrThrow(TABLE_TODOITEMS, null, values);
-            TodoItem newItem = createItem(id, itemText);
+            item.setId(id);
             db.setTransactionSuccessful();
         } catch (Exception e) {
             Log.d(TAG, "Error while trying to add item to database");
@@ -144,9 +147,4 @@ public class TodoItemDatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    private TodoItem createItem(long id, String text) {
-        TodoItem item = new TodoItem(text);
-        item.setId(id);
-        return item;
-    }
 }

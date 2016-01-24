@@ -115,14 +115,12 @@ public class MainActivity extends ActionBarActivity {
 
     public void onAddItem(View view) {
         String newItemText = etNewItem.getText().toString();
-
-        databaseHelper.addTodoItem(newItemText);
-
         TodoItem newItem = new TodoItem(newItemText);
+
+        databaseHelper.addTodoItem(newItem);
         todoAdapter.add(newItem);
         todoAdapter.notifyDataSetChanged();
         etNewItem.setText("");
-
     }
 
     private void setupListViewListener() {

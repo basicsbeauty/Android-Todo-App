@@ -2,6 +2,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:weightSum="1">
+
     <TextView
         android:id="@+id/tvName"
         android:layout_width="68dp"
@@ -9,8 +10,18 @@
         android:text="Name"
         android:height="50px"
         android:elegantTextHeight="false"
-        android:textSize="25dp"
+        android:textSize="20dp"
         android:singleLine="true"
-        android:layout_weight="0.16"
+        android:layout_weight="0.65"
         android:padding="10dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Due Date"
+        android:id="@+id/tvDueDate"
+        android:layout_weight="0.35"
+        android:textSize="20dp"
+        android:gravity="right" />
+
 </LinearLayout>

@@ -6,9 +6,6 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.TextView;
-
-import java.util.Calendar;
 
 public class EditItemActivity extends ActionBarActivity {
     EditText etEditItemName;
@@ -16,7 +13,6 @@ public class EditItemActivity extends ActionBarActivity {
     long itemId;
     String itemText;
 
-    private TextView textDate;
     private DatePicker dpDueDate;
     private int year;
     private int month;
@@ -25,10 +21,6 @@ public class EditItemActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        final Calendar calendar = Calendar.getInstance();
-        int currentYear = calendar.get(Calendar.YEAR);
-        int currentMonth = calendar.get(Calendar.MONTH);
-        int currentDay = calendar.get(Calendar.DAY_OF_MONTH);
 
         setContentView(R.layout.activity_edit_item);
         pos = getIntent().getIntExtra("pos", 0);
@@ -40,12 +32,7 @@ public class EditItemActivity extends ActionBarActivity {
 
         etEditItemName = (EditText) findViewById(R.id.etEditItemName);
         etEditItemName.setText(itemText);
-        if (year == 0 || day == 0) {
-            setDate(currentYear, currentMonth, currentDay);
-        }
-        else {
-            setDate(year, month, day);
-        }
+        setDate(year, month, day);
     }
 
     public void onSave(View view) {

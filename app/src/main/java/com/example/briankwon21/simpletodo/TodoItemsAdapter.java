@@ -23,8 +23,10 @@ public class TodoItemsAdapter extends ArrayAdapter<TodoItem> {
         }
 
         TextView tvName = (TextView) convertView.findViewById(R.id.tvName);
+        TextView tvDueDate = (TextView) convertView.findViewById(R.id.tvDueDate);
 
         tvName.setText(item.getText());
+        tvDueDate.setText(item.getStrDueDate());
 
         return convertView;
     }
